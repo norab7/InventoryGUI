@@ -1,0 +1,10 @@
+main: baron.rol.main.InventoryGUI
+name: InventoryGUI
+version: 1.0
+api-version: 1.13
+author: norab7
+description: Probably not a plugin but running through the steps anway
+commands:
+  active:
+    description: Test that the plugin is loaded correctly
+    usage: /InventoryGUI
