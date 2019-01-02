@@ -2,19 +2,22 @@ package baron.rol.InventoryGUI;
 
 import java.util.UUID;
 
-public abstract class InventoryItem {
+import org.bukkit.event.inventory.ClickType;
+import org.bukkit.inventory.ItemStack;
+
+public abstract class InventoryItem extends ItemStack {
 	private final UUID UID = UUID.randomUUID();
 
 	public UUID getUID() {
 		return UID;
 	}
 
-	public abstract void action();
+	public abstract void action(ClickType c);
 
-	public abstract void leftClick();
+	protected abstract void leftClick();
 
-	public abstract void rightClick();
+	protected abstract void rightClick();
 
-	public abstract void middleClick();
+	protected abstract void middleClick();
 
 }

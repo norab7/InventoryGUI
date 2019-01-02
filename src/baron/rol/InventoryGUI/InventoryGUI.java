@@ -1,32 +1,40 @@
 package baron.rol.InventoryGUI;
 
+import java.util.HashMap;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.Inventory;
+import org.bukkit.inventory.ItemStack;
 
 // TODO: 
 // Create inventory to attach to
 // Add itemstack to add/set/update/etc methods changing inventories also
 // Implement some event functionality
+// Check use of Comparing ItemStack UUID in event instead of using slot position
 
 public class InventoryGUI {
 	private final UUID UID;
-	private final int PAGESIZE;
-	private final Player player;
+	private final Player PLAYER;
+	private final int INVSIZE;
+	private final String INVNAME;
 
-	private InventoryItem[] invSlots;
-	private UUID[] uuidSlots;
+	private Inventory inv;
+	private HashMap<Integer, InventoryItem> invMap;
 
 	// ### Constructors ###
 	public InventoryGUI(Player p, int n, String s) {
-		this.player = p;
-		this.PAGESIZE = 54;
 		this.UID = UUID.randomUUID();
+		this.PLAYER = p;
+		this.INVSIZE = n;
+		this.INVNAME = s;
 
-		this.invSlots = new InventoryItem[PAGESIZE];
-		this.uuidSlots = new UUID[PAGESIZE];
+		this.inv = Bukkit.createInventory(PLAYER, INVSIZE, INVNAME);
+		this.invMap = new HashMap<>();
+
 	}
 	//
 
@@ -38,96 +46,123 @@ public class InventoryGUI {
 
 	// ### Get Player ###
 	public Player getPlayer() {
-		return player;
+		return PLAYER;
 	}
+	//
+
+	// ### Get Inventory ###
+	public Inventory getInv() {
+		return this.inv;
+	}
+	//
 
 	// ### Add Item ###
-	public void addItem(InventoryItem item) {
-		for (int i = 0; i < PAGESIZE; i++) {
-			if (invSlots[i] == null) {
-				invSlots[i] = item;
-				uuidSlots[i] = item.getUID();
+	public boolean addItem(InventoryItem item) {
+		for (int i = 0; i < INVSIZE; i++) {
+			if (!hasItem(i)) {
+				invMap.put(i, item);
+				inv.setItem(i, item);
+				return true;
 			}
-		}
-	}
-
-	//
-
-	// ### Get Item ###
-	public InventoryItem getItem(int slot) {
-		return invSlots[slot];
-	}
-
-	public InventoryItem getItem(UUID uid) {
-		return invSlots[getSlot(uid)];
-	}
-	//
-
-	// ### Set Item non-forced ###
-	public boolean setItem(int slot, InventoryItem item) {
-		if (invSlots[slot] == null) {
-			invSlots[slot] = item;
-			return true;
 		}
 		return false;
 	}
 
-	public boolean setItem(UUID uid, InventoryItem item) {
-		int slot = getSlot(uid);
-
-		if (slot == -1) {
-			return false;
+	public boolean addItem(int slot, InventoryItem item) {
+		if (withInRange(slot) && !hasItem(slot)) {
+			invMap.put(slot, item);
+			inv.setItem(slot, item);
+			return true;
 		}
+		return false;
+	}
+	//
 
-		return setItem(slot, item);
+	// ### Set Item Forced ###
+	public boolean forceItem(int slot, InventoryItem item) {
+		if (withInRange(slot)) {
+			invMap.put(slot, item);
+			inv.setItem(slot, item);
+			return true;
+		}
+		return false;
+	}
+	//
+
+	// ### Get Item ###
+	public InventoryItem getItem(int slot) {
+		return invMap.get(slot);
+	}
+
+	public InventoryItem getItem(ItemStack item) {
+		if (item.getItemMeta().hasLore()) {
+			String itemLore = item.getItemMeta().getLore().get(0);
+			for (InventoryItem el : invMap.values()) {
+				if (el.getItemMeta().getLore().get(0).equals(itemLore)) {
+					return el;
+				}
+			}
+		}
+		return null;
 	}
 	//
 
 	// ### Get Slot Number ###
-	public int getSlot(UUID uid) {
-		for (int i = 0; i < PAGESIZE; i++) {
-			if (uuidSlots[i] == uid) {
+	public int getSlot(InventoryItem item) {
+		for (int i = 0; i < INVSIZE; i++) {
+			if (invMap.get(i) == item) {
 				return i;
 			}
 		}
 		return -1;
 	}
+	//
 
-	// ### Set Item Forced ###
-	public void forceItem(int slot, InventoryItem item) {
-		invSlots[slot] = item;
+	// ### Remove Item ###
+	public boolean removeItem(int slot) {
+		return (hasItem(slot) ? nullItem(slot) : false);
 	}
 
-	public void forceItem(UUID uid, InventoryItem item) {
-		invSlots[getSlot(uid)] = item;
+	public boolean removeItem(InventoryItem item) {
+		return (hasItem(item) ? nullItem(getSlot(item)) : false);
+	}
+
+	private boolean nullItem(int slot) {
+		invMap.remove(slot);
+		return true;
 	}
 	//
 
 	// ### Has Item ###
 	public boolean hasItem(int slot) {
-		if (invSlots[slot] != null) {
-			return true;
-		}
-		return false;
+		return invMap.containsKey(slot);
 	}
 
-	public boolean hasItem(UUID uid) {
-		if (invSlots[getSlot(uid)] != null) {
-			return true;
-		}
-		return false;
+	public boolean hasItem(InventoryItem item) {
+		return invMap.containsValue(item);
 	}
+	//
+
+	// ### Within Range ###
+	private boolean withInRange(int slot) {
+		return slot >= 0 && slot < INVSIZE;
+	}
+	//
 
 	// ### onClickEvent //
 	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 
-		if (!player.getName().equals(e.getWhoClicked().getName())) {
+		if (!PLAYER.getName().equals(e.getWhoClicked().getName())) {
+			return;
+		}
+
+		if (!(e.getCurrentItem() instanceof ItemStack)) {
 			return;
 		}
 
 		int slot = e.getRawSlot();
-		if (PAGESIZE < slot) {
+		if (INVSIZE <= slot) {
 			return;
 		}
 
@@ -135,22 +170,6 @@ public class InventoryGUI {
 			return;
 		}
 
-		switch (e.getClick()) {
-		case LEFT:
-
-			break;
-		case RIGHT:
-
-			break;
-		case MIDDLE:
-
-			break;
-
-		default:
-
-			break;
-		}
-
+		getItem(slot).action(e.getClick());
 	}
-
 }

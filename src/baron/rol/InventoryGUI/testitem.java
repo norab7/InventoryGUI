@@ -1,29 +1,31 @@
 package baron.rol.InventoryGUI;
 
-public class testitem implements InventoryItem {
+import org.bukkit.event.inventory.ClickType;
+
+public class testitem extends InventoryItem {
 
 	@Override
-	public void action() {
+	public void action(ClickType c) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void leftClick() {
+	protected void leftClick() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void rightClick() {
+	protected void rightClick() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
-	public void middleClick() {
+	protected void middleClick() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }
