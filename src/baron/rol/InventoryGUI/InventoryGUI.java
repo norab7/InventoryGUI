@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
@@ -16,7 +17,7 @@ import org.bukkit.inventory.ItemStack;
 // Implement some event functionality
 // Check use of Comparing ItemStack UUID in event instead of using slot position
 
-public class InventoryGUI {
+public class InventoryGUI implements Listener {
 	private final UUID UID;
 	private final Player PLAYER;
 	private final int INVSIZE;
@@ -163,7 +164,7 @@ public class InventoryGUI {
 
 		int slot = e.getRawSlot();
 		if (INVSIZE <= slot) {
-			return;
+			return;	
 		}
 
 		if (!hasItem(slot)) {
