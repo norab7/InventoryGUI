@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -17,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 // Implement some event functionality
 // Check use of Comparing ItemStack UUID in event instead of using slot position
 
-public class InventoryGUI implements Listener {
+public class InventoryGUI {
 	private final UUID UID;
 	private final Player PLAYER;
 	private final int INVSIZE;
@@ -27,11 +26,11 @@ public class InventoryGUI implements Listener {
 	private HashMap<Integer, InventoryItem> invMap;
 
 	// ### Constructors ###
-	public InventoryGUI(Player p, int n, String s) {
+	public InventoryGUI(Player player, int size, String name) {
 		this.UID = UUID.randomUUID();
-		this.PLAYER = p;
-		this.INVSIZE = n;
-		this.INVNAME = s;
+		this.PLAYER = player;
+		this.INVSIZE = size;
+		this.INVNAME = name;
 
 		this.inv = Bukkit.createInventory(PLAYER, INVSIZE, INVNAME);
 		this.invMap = new HashMap<>();
@@ -151,7 +150,6 @@ public class InventoryGUI implements Listener {
 	//
 
 	// ### onClickEvent //
-	@EventHandler
 	public void onInventoryClick(InventoryClickEvent e) {
 
 		if (!PLAYER.getName().equals(e.getWhoClicked().getName())) {
@@ -164,7 +162,7 @@ public class InventoryGUI implements Listener {
 
 		int slot = e.getRawSlot();
 		if (INVSIZE <= slot) {
-			return;	
+			return;
 		}
 
 		if (!hasItem(slot)) {
@@ -172,5 +170,6 @@ public class InventoryGUI implements Listener {
 		}
 
 		getItem(slot).action(e.getClick());
+		e.setCancelled(true);
 	}
 }
