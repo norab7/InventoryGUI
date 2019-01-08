@@ -8,11 +8,11 @@ import org.bukkit.inventory.ItemStack;
 
 public abstract class InventoryItem extends ItemStack {
 	private final UUID UID = UUID.randomUUID();
-	private final ItemStack item;
+	private ItemStack item;
 
 	// ### Constructors ###
-	public InventoryItem(ItemStack item) {
-		this.item = item;
+	public InventoryItem() {
+
 	}
 	//
 
