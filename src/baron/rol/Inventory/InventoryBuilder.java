@@ -1,4 +1,4 @@
-package baron.rol.InventoryGUI;
+package baron.rol.Inventory;
 
 import java.util.HashMap;
 import java.util.UUID;
@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack;
 // Implement some event functionality
 // Check use of Comparing ItemStack UUID in event instead of using slot position
 
-public class InventoryGUI {
+public class InventoryBuilder {
 	private final UUID UID;
 	private final Player PLAYER;
 	private final int INVSIZE;
@@ -26,7 +26,7 @@ public class InventoryGUI {
 	private HashMap<Integer, InventoryItem> invMap;
 
 	// ### Constructors ###
-	public InventoryGUI(Player player, int size, String name) {
+	public InventoryBuilder(Player player, int size, String name) {
 		this.UID = UUID.randomUUID();
 		this.PLAYER = player;
 		this.INVSIZE = size;
@@ -38,22 +38,27 @@ public class InventoryGUI {
 	}
 	//
 
-	// ### Get Unique ID ###
+	// ### Getters ###
 	public UUID getUID() {
 		return UID;
 	}
-	//
 
-	// ### Get Player ###
 	public Player getPlayer() {
 		return PLAYER;
 	}
-	//
 
-	// ### Get Inventory ###
+	public int getSize() {
+		return this.INVSIZE;
+	}
+
+	public String getName() {
+		return this.INVNAME;
+	}
+
 	public Inventory getInv() {
 		return this.inv;
 	}
+
 	//
 
 	// ### Add Item ###
@@ -169,7 +174,7 @@ public class InventoryGUI {
 			return;
 		}
 
-		getItem(slot).action(e.getClick());
+		getItem(slot).action(e);
 		e.setCancelled(true);
 	}
 }
